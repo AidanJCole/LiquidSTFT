@@ -8,11 +8,12 @@ from Lib import wave
 from math import sin, pi, atan2, sqrt
 
 def sinebow(t):
-    r = 128*sin(2*pi*t)+128
-    g = 128*sin(2*pi*t+2*pi/3)+128
-    b = 128*sin(2*pi*t+4*pi/3)+128
+    r = 127.5*sin(2*pi*t)+127.5
+    g = 127.5*sin(2*pi*t+2*pi/3)+127.5
+    b = 127.5*sin(2*pi*t+4*pi/3)+127.5
 
-    return (r,g,b)
+
+    return (int(r),int(g),int(b))
 
 targetHertz = 100
 
@@ -22,8 +23,12 @@ print(f"Channels: {file.getnchannels()}\nByte width: {file.getsampwidth()}\nFram
 
 test = list(memoryview(file.readframes(file.getnframes())).cast("h"))
 
-temp = stft(test, window="hann", nperseg=256)
+f, n, Zxx = stft(test, window="hann", nperseg=256)
 
+graphC = Image.new('RGB', Zxx.shape, 0)
+graph = graphC.load()
+for x in range(Zxx.shape[0]):
+    for y in range(Zxx.shape[1]):
+        graph[x,y] = sinebow((atan2(Zxx[x,y].real, Zxx[x,y].imag)+pi/2)/pi)
 
-
-
+graphC.save("test.png", "PNG")
