@@ -25,24 +25,27 @@ test = list(memoryview(file.readframes(file.getnframes())).cast("h"))
 
 f, n, Zxx = stft(test, window="hann", nperseg=512)
 
-#graphC = Image.new('RGB', Zxx.shape, 0)
-#graph = graphC.load()
+graphC = Image.new('RGB', Zxx.shape, 0)
+graph = graphC.load()
 max = 0
 min = 5000000000
 for x in range(Zxx.shape[0]):
     for y in range(Zxx.shape[1]):
-        #colorPhase = sinebow((atan2(Zxx[x,y].real, Zxx[x,y].imag)+pi/2)/pi)
+        colorPhase = sinebow((atan2(Zxx[x,y].real, Zxx[x,y].imag)+pi/2)/pi)
         # maximum/min amp: 5363.286519380089 0.0
         magnitude = sqrt(Zxx[x,y].real**2 + Zxx[x,y].imag**2)
         temp = magnitude/32767
-        if temp > 327.67:
+        db = 0
+        if magnitude > 3.2767:
             db = 20 * log10(temp)
         else:
-            db = -40
-        max = db if max < db else max
-        min = db if min > db else min
-        #graph[x,y] = colorPhase
+            db = -80
 
-#graphC.save("test.png", "PNG")
+        val = (db+80)/80
+        #color = (int(colorPhase[0]*val),int(colorPhase[1]*val),int(colorPhase[2]*val))
+        color = (int(255 * val), int(255 * val), int(255 * val))
+        graph[x,y] = color
+
+graphC.save("test.png", "PNG")
 
 print(max, min)

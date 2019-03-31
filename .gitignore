@@ -108,3 +108,4 @@ venv.bak/
 
 # Project specific
 *.wav
+*.png
